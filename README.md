@@ -20,7 +20,14 @@ Add this given script in user data while launching the master node instance in a
     gpgkey=https://packages.cloud.google.com/yum/doc/rpm-package-key.gpg
     exclude=kubelet kubeadm kubectl
     EOF
-
+    
+    sudo cat <<EOF >  /etc/sysctl.d/k8s.conf
+    net.bridge.bridge-nf-call-ip6tables = 1
+    net.bridge.bridge-nf-call-iptables = 1
+    EOF
+    
+    sysctl --system
+    setenforce 0
 
     sudo yum install docker -y
     sudo systemctl start docker
