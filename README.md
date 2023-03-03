@@ -48,8 +48,7 @@ Add this given script in user data while launching the master node instance in a
     sudo chown $(id -u):$(id -g) $HOME/.kube/config
     export KUBECONFIG=/etc/kubernetes/admin.conf
 
-    sudo curl https://raw.githubusercontent.com/projectcalico/calico/v3.24.5/manifests/calico.yaml -O
-    kubectl apply -f calico.yaml
+    sudo kubectl apply -f https://github.com/weaveworks/weave/releases/download/v2.8.1/weave-daemonset-k8s.yaml
     
     if [[ $? == 0 ]]
     then
@@ -78,7 +77,14 @@ Add this given script in user data while launching the worker node instance in a
     exclude=kubelet kubeadm kubectl
     EOF
 
-
+    sudo cat <<EOF >  /etc/sysctl.d/k8s.conf
+    net.bridge.bridge-nf-call-ip6tables = 1
+    net.bridge.bridge-nf-call-iptables = 1
+    EOF
+    
+    sysctl --system
+    setenforce 0
+    
     sudo yum install docker -y
     sudo systemctl start docker
     sudo systemctl enable docker
